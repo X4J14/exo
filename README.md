@@ -36,9 +36,10 @@
 ```
 **;; Requirements ;;**
 ```
-1) SBCL (tested on SBCL 2.4 and above)      <https://sbcl.org>
-2) curl (wrapped for fetching remote files) <https://curl.se>
-3) signify (wrapped for sign modules)       <https://man.openbsd.org/signify>
+1) SBCL (tested on SBCL 2.4 and above)   https://sbcl.org
+2) curl (used for fetching remote files) https://curl.se
+3) signify (used for sign modules)       https://man.openbsd.org/signify
+4) git (used for hashing files)          https://git-scm.com
 ```
 *Exo implemented in 1 file without external dependencies except mentioned.*
 
@@ -225,7 +226,7 @@ Examples:
 		:test "<value>"
 		:test-... "<value>"
 		...
-		:use (:<runtime-package> ...) or ((:<runtime-package> :<shadow symbol> ...) ...)
+		:use (:<runtime-package> ...) or ((:<runtime-package> :<shadow symbol>) ...)
 		:dependencies (
 			:<module-id> "<module-version"
 			...
