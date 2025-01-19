@@ -2062,7 +2062,7 @@
 
 (defun verify-public-key (mod secure-key-path secure-key-pass public-key urls)
 	"Ensure that public key matches to secure key"
-	(pfmtl "Test signature for public key: ~s" public-key)
+	(pfmt "Test signature for public key: ~s" public-key)
 	(lets (sig-file-path (make-repo-tmp-path))
 		(signify-sign mod
 			secure-key-path secure-key-pass
@@ -2071,7 +2071,7 @@
 			(make-public-key-file public-key)
 			sig-file-path
 			(make-repo-tmp-path)))
-	(pfmt " - OK")
+	(pfmtl " - OK")
 	; fetch keys and compare
 	(dolist (url urls)
 		(handler-case
@@ -2088,19 +2088,19 @@
 					(pfmtl "***********************************"))
 		)))
 
-(defmacro exo:sign (path secure-key-path &optional secure-key-pass)
-	`(do-sign ',path ,secure-key-path ,secure-key-pass))
+(defmacro exo:sign (mod-path secure-key-path &optional secure-key-pass)
+	`(do-sign ',mod-path ,secure-key-path ,secure-key-pass))
 
 (defun do-sign (mod-path secure-key-path secure-key-pass)
 	(check-type mod-path module-path "module config path or (<mod-id> \"<mod-ver\")")
 	(check-type secure-key-path string)
 	(check-type secure-key-pass (or null string))
-	(pfmtl "::: Sign module ~s :::" mod-path)
+	(pfmtl "::: Sign module ~(~s~) :::" mod-path)
 	(handler-case
 		(lets (
 				mod (get-module mod-path)
 				sig-file-path (string+ (.path mod) %sig-file-name%))
-			(pfmtl "(~(~s~) ~s)" (.id mod) (.version mod))
+			;(pfmtl "(~(~s~) ~s)" (.id mod) (.version mod))
 			(unless secure-key-pass
 				(pfmtl "Enter secure key password:~%")
 				(setf secure-key-pass (read-without-echo)))
@@ -2109,13 +2109,13 @@
 					(progn
 						(verify-public-key mod secure-key-path secure-key-pass public-key urls)
 						(when (probe-file sig-file-path)
-							(if (yes-or-no-p "Module is already signed and will signed again. ~%Continue?")
+							(if (yes-or-no-p "Module is already signed and will re-signed. ~%Continue?")
 								(delete-file sig-file-path)
 								(sign-error "Operation canceled" mod)))
 						(signify-sign mod
 							secure-key-path secure-key-pass
 							sig-file-path (make-hashes-file mod)))
-					(sign-error "Public key is not defined" mod)))
+					(sign-error  (fmt "Public key is not defined in ~s" (.cfg-path mod)) mod)))
 			(pfmtl "Signature file created: ~s~%Done" sig-file-path))
 		(<exo-error> (c)
 			(.print c))
@@ -2134,19 +2134,19 @@
 						(if (exo:repo) (make-repo-tmp-dir) (.path mod)) %hashes-file-name%)) public-key
 				(if sig-file-pname
 					(progn
-						(pfmtl "Test signature ~s" sig-file-path)
+						(pfmt "Test signature ~s" sig-file-path)
 						(signify-verify mod
 							(make-public-key-file public-key)
 							sig-file-path hashes-file-path)
-						(pfmt " - OK")
+						(pfmtl " - OK")
 						(pfmtl "Checking hashes ...")
 						(file-iterate-lines hashes-file-path (lambda (line)
-							(pfmtl "~s" line)
+							(pfmt "~s" line)
 							(let-if (
 									hash (subseq line 0 40)
 									file-path (string+ (.path mod) (subseq line 41))
 									calc-hash (get-git-hash file-path)) (equal hash calc-hash)
-								(pfmt " - OK")
+								(pfmtl " - OK")
 								(sign-verify-error "Hashes did't match: valid ~s, calculated ~s" mod hash calc-hash))))
 						(pfmtl "Done"))
 					(sign-verify-error "File ~s does not exist" mod sig-file-path))
@@ -2248,8 +2248,10 @@
 			(if path
 				(repo-check path)
 				(repo-does-not-set!))
-			(pfmtl "~{~(~s~)~^~%~}" (do-list output path))
-			(pfmtl "Done"))
+			(lets (mods (do-list output path))
+				(pfmtl "~{~(~s~)~^~%~}" mods)
+				(pfmtl "Done")
+				mods))
 		(<exo-error> (c)
 			(.print c))
 	))
@@ -2299,7 +2301,7 @@
 	(pfmt "Check signature...")
 	(if (.signature mod)
 		(progn
-			(pfmt " (signed) ")
+			(pfmtl " (signed) ")
 			(do-sign-verify mod))
 		(pfmt " (not signed) "))
 	(pfmtl "- OK"))
@@ -3086,15 +3088,18 @@
 				active-package *package*
 				file-path (string+ (.path mod) "src/" run-pkg-name ".lisp"))
 			(pfmtl "~a" mod)
-			(let-when (sign (.signature mod)) sign
-				(without-output (do-sign-verify mod))
+			(lets (mod-sign (.signature mod))
+				(when mod-sign
+					(without-output (do-sign-verify mod)))
 				(unless is-run-standalone
-					(let-when (signs (.signatures (exo:repo))) (.secure (exo:repo))
-						(unless signs
+					(let-when (repo-signs (.signatures (exo:repo))) (.secure (exo:repo))
+						(unless mod-sign
+							(exo-error "Repository ~s is secure but module is not signed" (.path (exo:repo))))
+						(unless repo-signs
 							(exo-error "Repository ~s is secure but signatures are not defined" (.path (exo:repo))))
-						(unless (plist/find signs :key sign)
+						(unless (plist/find repo-signs :key mod-sign)
 							(exo-error "Running module (~(~s~) ~s) is forbidden because it signed by unknown signature ~s"
-								(.id mod) (.version mod) sign)))))
+								(.id mod) (.version mod) mod-sign)))))
 			(setf
 				*exo-module* mod
 				*exo-modules* (list mod))
