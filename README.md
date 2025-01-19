@@ -226,7 +226,7 @@ Examples:
 		:test "<value>"
 		:test-... "<value>"
 		...
-		:use (:<runtime-package> ...) or ((:<runtime-package> :<shadow symbol>) ...)
+		:use (:<runtime-package> ...) or ((:<runtime-package> :<shadow-symbol> ...) ...)
 		:dependencies (
 			:<module-id> "<module-version"
 			...
