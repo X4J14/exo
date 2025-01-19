@@ -410,8 +410,7 @@ Remote installation make the same thing, but first download files to temporary d
 (exo:install :codeberg/github "<owner>/<repo>" :branch "<value>" :<mod-id> "<mod-version>") ;=> <module>
 ```
 
-The :sources property relates to remote modules/repositories only.
-But :dependencies can contains data about local and remote modules.
+The :sources property of the exo.repo config is relates to remote modules/repositories only.
 ```lisp
 (
 	:exo-version 1.0
@@ -423,21 +422,27 @@ But :dependencies can contains data about local and remote modules.
 		))
 
 ; Example:
+exo.mod
 (
 	:exo-version 1.0
 	:module (
 		...
 		:dependencies (
-			:gamma "0.99" ; local dependency
-			:alpha-repo ( ; multiple modules in remote repository
-				:alpha "1.0"
-				:alpha-test "1.2")
-			:omega-mod
-				:omega "0.1a") ; only one possible because it is remote module (not repository)
+			:gamma "0.99"
+		)))
+exo.repo
+(
+	:exo-version: 1.0
+	:repository (
+		:sources (
+			:codeberg "user1/repo1" :branch "main"
+			:github "user2/repo2" :branch "master"
 		)))
 ```
+Exo will search a module (:gamma "0.99") in the defined sources of repository consecutively.
+
 *Note:
-Remote installation can requires a token to access to private repositories or to avoid download limitation (for github)*
+Remote installation can requires a token for access to private repositories or to avoid download limitation (for github)*
 So, before to install run a commamd:
 ```lisp
 (exo:token :<codeberg/github> "<value>")
@@ -526,6 +531,7 @@ Example:
 		...
 		:signature (
 			:key "RWTVUUc2t+JbvfzMB+OX3sBhqWvrHuikwvJXE1sgMVXlnQLLiRgyQ00c"
+			:owner "User"
 			:urls (
 				"https://codeberg.org/user/repo/raw/branch/main/key.pub"
 			))
