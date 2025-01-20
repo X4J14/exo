@@ -513,7 +513,7 @@ Example:
 ```
 **;; Signing module ;;**
 
-Signing the module creates ".hashes.sig" in the root module directory which contains hashes of all module files.
+Signing the module creates "exo.mod.sig" file in the root module directory which contains hashes of all module files.
 Before, need to create secure and public keys using "signify" tool from OpenBSD project.
 The most popular Linux and BSD operation systems has this one in their repositories.
 
@@ -538,7 +538,7 @@ Example:
 	))
 ```
 Exo "sign" command uses "signify", so, this one should be available for run.
-Make sure that the util installed to folder mentioned in system PATH variable.
+Make sure that the util installed to folder mentioned in system :PATH variable.
 ```lisp
 (exo:sign "<mod-cfg-path>" "<secure-key-path>" "<secure-key-pass>") => <<module-dir>/.hashes.sig>
 ```
