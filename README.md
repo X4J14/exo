@@ -92,8 +92,8 @@ File structure:
          /src
             alpha.lisp
             beta.lisp
-         /test
-            gamma.lisp
+            /test
+               gamma.lisp
          exo.mod
    /omega
       /0.1a
