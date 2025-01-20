@@ -69,67 +69,66 @@ File structure:
 
 ```
 /repository
-	/module
-		/version
-			/info ; License and documentation files. (optional)
-			/data ; Necessary files for the module. (optional)
-			/src
-				package.lisp
-				...
-			exo.mod
-		...
-	...
-	exo.repo
+   /module
+      /version
+         /info ; License and documentation files. (optional)
+         /data ; Necessary files for the module. (optional)
+         /src
+            package.lisp
+            ...
+         exo.mod
+      ...
+   ...
+   exo.repo
 ```
 ; Example
 ```
 ~/.exo
-	/alpha
-		/1.0
-			/info
-				LICENSE
-				readme.txt
-			/src
-				alpha.lisp
-				beta.lisp
-				/test
-					gamma.lisp
-			exo.mod
-	/omega
-		/0.1a
-			/data
-				test-1
-				test-2
-			/src
-				omega.lisp
-			exo.mod
-	exo.repo
+   /alpha
+      /1.0
+         /info
+            LICENSE
+            readme.txt
+         /src
+            alpha.lisp
+            beta.lisp
+         /test
+            gamma.lisp
+         exo.mod
+   /omega
+      /0.1a
+         /data
+            test-1
+            test-2
+         /src
+            omega.lisp
+         exo.mod
+   exo.repo
 ```
 **Configuration file: exo.repo**
 ```lisp
 (
-	:exo-version 1.0
-	:name "<value>" ; optional
-	:description "<value>" ; optional
-	:repository (
-		:secure t|nil ; optional
-		:sources ( ; optional
-			:<github/codeberg> (
-				:<source-id> "<owner>/<repo>" :branch "<value>"
-				...
-			)
-			...
-		)
-		:signatures ( ; optional
-			(:key "<value>"
-				; optional in free form below
-				:owner "<value>" 
-				:url "<value>" ...)
-			...
-		))
-	:about ( ; optional
-		...
-	))
+   :exo-version 1.0
+   :name "<value>" ; optional
+   :description "<value>" ; optional
+   :repository (
+      :secure t|nil ; optional
+      :sources ( ; optional
+	 :<codeberg/github> "<owner>/<repo>" :branch "<value>"
+         ...
+      )
+      :signatures ( ; optional
+         (:key "<value>"
+            ; optional in free form below
+            :owner "<value>" 
+            :url "<value>")
+         ...
+      )
+   )
+   :about ( ; optional
+      ...
+   )
+)
 ```
 **;; Commands ;;**
 
@@ -192,70 +191,64 @@ In other words, install and run either with unsigned modules or modules signed b
 Examples:
 ```lisp
 (
-	:exo-version 1.0s
-	:name "Alpha"
-	:description "Prime Alpha repository"
-	:repository (
-		:secure t
-		:sources (
-			:github (
-				:alpha-repo "user/alpha-repo" :branch "main")
-			:codeberg (
-				:omega-mod "user/omega-mod" :branch "last")
-		)
-		:signatures ((
-			:key "RWTVUUc2t+JbvfzMB+OX3sBhqWvrHuikwvJXE1sgMVXlnQLLiRgyQ00c"
-			:owner "User"
-			:url "https://codeberg.org/user/repo/raw/branch/main/key.pub")
-		)))
+   :exo-version 1.0s
+   :name "Alpha"
+   :description "Prime Alpha repository"
+   :repository (
+      :secure t
+      :signatures ((
+         :key "RWTVUUc2t+JbvfzMB+OX3sBhqWvrHuikwvJXE1sgMVXlnQLLiRgyQ00c"
+         :owner "User"
+	   :url "https://codeberg.org/user/repo/raw/branch/main/key.pub")
+      )))
 ```
 ;;; Module ;;;
 
 **; Configuration file: exo.mod**
 ```lisp
 (
-	:exo-version 1.0
-	:name "<value>"
-	:description "<value>"
-	:module (
-		:id :<value>
-		:version "<value>"
-		:run "<value>"
-		:run-... "<value>"
-		...
-		:test "<value>"
-		:test-... "<value>"
-		...
-		:use (:<runtime-package> ...) or ((:<runtime-package> :<shadow-symbol> ...) ...)
-		:dependencies (
-			:<module-id> "<module-version"
-			...
-		)
-		:signature (
-			:key "<value>"
-			:urls (
-				"https://...<name>.pub"
-				...
-			)
-		))
-		:properties (
-			:<key> "<value>"
-			...
-		)
-		:about (
-			...
-		))
+   :exo-version 1.0
+   :name "<value>"
+   :description "<value>"
+   :module (
+      :id :<value>
+      :version "<value>"
+      :run "<value>"
+      :run-... "<value>"
+      ...
+      :test "<value>"
+      :test-... "<value>"
+      ...
+      :use (:<runtime-package> ...) or ((:<runtime-package> :<shadow-symbol> ...) ...)
+      :dependencies (
+         :<module-id> "<module-version"
+	...
+      )
+      :signature (
+         :key "<value>"
+         :urls (
+            "https://...<name>.pub"
+            ...)
+	)
+   )
+   :properties (
+      :<key> "<value>"
+      ...
+   )
+   :about (
+      ...
+   ))
 ```
 **; Minimal configuration file: exo.mod**
 
 All properties are optional except mentiond below:
 ```lisp
 (
-	:exo-version 1.0
-	:module (
-		:id :<value>
-		:version "<value>"
-	))
+   :exo-version 1.0
+   :module (
+      :id :<value>
+      :version "<value>"
+   ))
 ```
 **;; Packages hierarchy and managment ;;**
 
@@ -268,21 +261,21 @@ All properties are optional except mentiond below:
 Each source file managed by Exo should started with the "exo" function:
 ```lisp
 (exo
-	(:export
-		:intern
-			#:<symbol> ...)
-		:extern
-			#:<symbol> ...)
-	(:import
-		:intern
-			#:<package>
-			(#:<package> #:<nickname>)
-			(#:<package> (#:<symbol>...))
-		:extern
-			...
-		:runtime
-			...)
-	)) 
+   (:export
+      :intern
+         #:<symbol> ...
+      :extern
+         #:<symbol> ...)
+   (:import
+      :intern
+         #:<package>
+         (#:<package> #:<nickname>)
+         (#:<package> (#:<symbol>...))
+      :extern
+         ...
+      :runtime
+         ...
+   )) 
 ;...
 (module code)
 ;...
@@ -310,38 +303,38 @@ Let say, "alpha.lisp" from "alpha" module exports "hello" function.
 **Repository structure:**
 ```
 ~/.exo ; repository directory
-	/alpha  ; matches to module id
-		/1.0 ; mathes to module version
-			/src ; all source files always here
-				alpha.lisp ; package "alpha" ; possible shorthand of "alpha/alpha" when the file name the same as module id
-				beta.lisp  ; package "alpha/beta"
-				/test
-					gamma.lisp ; package "alpha/test/gamma"
-			exo.mod ; module config file
-	/omega
-		/0.1a
-			/src
-				omega.lisp ; package "omega"
-			exo.mod
-	exo.repo : repository config file
+   /alpha  ; matches to module id
+      /1.0 ; mathes to module version
+         /src ; all source files always here
+            alpha.lisp ; package "alpha" ; possible shorthand of "alpha/alpha" when the file name the same as module id
+            beta.lisp  ; package "alpha/beta"
+         /test
+            gamma.lisp ; package "alpha/test/gamma"
+         exo.mod ; module config file
+   /omega
+      /0.1a
+         /src
+            omega.lisp ; package "omega"
+         exo.mod
+   exo.repo : repository config file
 ```
 ~/.exo/alpha/1.0/exo.mod
 ```lisp
 (
-	:exo-version 1.0
-	:module (
-		:id :alpha
-		:version "1.0"
-		...
-	))
+   :exo-version 1.0
+   :module (
+      :id :alpha
+      :version "1.0"
+      ...
+   ))
 ```
 ~/.exo/alpha/1.0/src/alpha.lisp
 ```lisp
 (exo
-	(:export
-		:intern #:hello
-		:extern #:hello
-	))
+   (:export
+      :intern #:hello
+      :extern #:hello
+   ))
  
 (defun hello () (print "Hello"))
 ```
@@ -350,37 +343,36 @@ Let say, "alpha.lisp" from "alpha" module exports "hello" function.
 ~/.exo/alpha/1.0/src/beta.lisp
 ```lisp
 (exo
-	(:import
-		:intern
-			#:alpha  ; import all symbols => (hello)
-			; or
-			(#:alpha #:a) ; add local nickname => (a:hello)
-			; or
-			(#:alpha (#:hello)) ;  import specified symbols => (hello)
-		))
+   (:import
+      :intern
+         #:alpha  ; import all symbols => (hello)
+         ; or
+         (#:alpha #:a) ; add local nickname => (a:hello)
+         ; or
+         (#:alpha (#:hello)) ;  import specified symbols => (hello)
+   ))
 ```
 **; Import to package from external module**
 
 ~/.exo/omega/0.1a/exo.mod
 ```lisp
 (
-	:exo-version 1.0
-	:module (
-		:id :omega
-		:version "0.1a"
-		...
-		:dependencies (
-			:alpha "1.0"
-		)
-	))
+   :exo-version 1.0
+   :module (
+      :id :omega
+      :version "0.1a"
+      ...
+      :dependencies (
+         :alpha "1.0"
+      )))
 ```
 ~/.exo/omega/0.1a/src/omega.lisp
 ```lisp
 (exo
-	(:import
-		:extern
-			... the same as above in beta.lisp ...
-		))
+   (:import
+      :extern
+	... the same as above in beta.lisp ...
+   ))
 ```
 **;; Install module. Local and remote dependencies ;;**
 
@@ -398,11 +390,11 @@ After that install module:
 The command will create module directory in the repository:
 ```
 /<repo-path>
-	/<mod-id> ; from module config file
-		/<mod-version> ; from module config file
-			/src
-				.. copy of the source files ..
-			exo.mod ; copy of the "<mod-cfg-path>"
+   /<mod-id> ; from module config file
+      /<mod-version> ; from module config file
+         /src
+	   .. copy of the source files ..
+	exo.mod ; copy of the "<mod-cfg-path>"
 ```
 **; Remote**
 Remote installation make the same thing, but first download files to temporary directory of repository.
@@ -413,31 +405,31 @@ Remote installation make the same thing, but first download files to temporary d
 The :sources property of the exo.repo config is relates to remote modules/repositories only.
 ```lisp
 (
-	:exo-version 1.0
-	:module (
-		...
-		:dependencies (
-			:<mod-id> "<mod-version>" ; value is string
-			...
-		))
+   :exo-version 1.0
+   :module (
+      ...
+      :dependencies (
+         :<mod-id> "<mod-version>" ; value is string
+	...
+      )))
 
 ; Example:
 exo.mod
 (
-	:exo-version 1.0
-	:module (
-		...
-		:dependencies (
-			:gamma "0.99"
-		)))
+   :exo-version 1.0
+   :module (
+      ...
+      :dependencies (
+         :gamma "0.99"
+      )))
 exo.repo
 (
-	:exo-version: 1.0
-	:repository (
-		:sources (
-			:codeberg "user1/repo1" :branch "main"
-			:github "user2/repo2" :branch "master"
-		)))
+   :exo-version: 1.0
+   :repository (
+      :sources (
+         :codeberg "user1/repo1" :branch "main"
+         :github "user2/repo2" :branch "master"
+      )))
 ```
 Exo will search a module (:gamma "0.99") in the defined sources of repository consecutively.
 
@@ -460,27 +452,27 @@ Example:
 ```lisp
 (exo (:export :intern #:exo-run)
 (define exo-run (mod-path mod-props)
-	...)
+   ...)
 ```
 *Note: Exo search a run function in the :intern export layer.*
 
 **; Run and test parameters**
 ```lisp
 (
-	:exo-version 1.0
-	:module (
-		...
-		:run :<package> ; by default will call "exo-run" function
-		:run :<package>@<function> ; define custom function
-		:run (:<package>@<function> args...) ; define custom function with args
-		:run :@<function> ; Shorthand version starts with @. A package name the same as module id.
-		:run (:@<function> args...)
-		:run-<whatever> ...
+   :exo-version 1.0
+   :module (
+      ...
+      :run :<package> ; by default will call "exo-run" function
+      :run :<package>@<function> ; define custom function
+      :run (:<package>@<function> args...) ; define custom function with args
+      :run :@<function> ; Shorthand version starts with @. A package name the same as module id.
+      :run (:@<function> args...)
+      :run-<whatever> ...
 
-		:test .. ; the same as above
-		:test-<whatever> ...
-		...
-	))
+      :test .. ; the same as above
+      :test-<whatever> ...
+      ...
+   ))
 ```
 **; Run module in standalone mode (by configuration file)**
 
@@ -526,16 +518,14 @@ If the keys mismatched then an error will be thrown.
 Example:
 ```lisp
 (
-	:exo-version 1.0
-	:module (
-		...
-		:signature (
-			:key "RWTVUUc2t+JbvfzMB+OX3sBhqWvrHuikwvJXE1sgMVXlnQLLiRgyQ00c"
-			:owner "User"
-			:urls (
-				"https://codeberg.org/user/repo/raw/branch/main/key.pub"
-			))
-	))
+   :exo-version 1.0
+   :module (
+      ...
+      :signature (
+         :key "RWTVUUc2t+JbvfzMB+OX3sBhqWvrHuikwvJXE1sgMVXlnQLLiRgyQ00c"
+         :owner "User"
+         :urls ("https://codeberg.org/user/repo/raw/branch/main/key.pub")
+	)))
 ```
 Exo "sign" command uses "signify", so, this one should be available for run.
 Make sure that the util installed to folder mentioned in system :PATH variable.
