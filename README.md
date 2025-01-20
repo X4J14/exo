@@ -186,7 +186,7 @@ File structure:
 
 When secure mode is enabled `(:secure t)`, then property `(:signatures (...))` should be defined also.
 Secure mode guarantees that only signed modules by predefined keys can be installed or runned.
-In other words, install and run either with unsigned modules or modules signed by unknown keys will forbidden.
+In other words, installing and running either unsigned modules or modules signed by unknown keys will forbidden.
 
 Examples:
 ```lisp
