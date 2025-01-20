@@ -199,7 +199,7 @@ Examples:
       :signatures ((
          :key "RWTVUUc2t+JbvfzMB+OX3sBhqWvrHuikwvJXE1sgMVXlnQLLiRgyQ00c"
          :owner "User"
-	   :url "https://codeberg.org/user/repo/raw/branch/main/key.pub")
+         :url "https://codeberg.org/user/repo/raw/branch/main/key.pub")
       )))
 ```
 ;;; Module ;;;
@@ -226,10 +226,8 @@ Examples:
       )
       :signature (
          :key "<value>"
-         :urls (
-            "https://...<name>.pub"
-            ...)
-	)
+         :urls ("https://...<name>.pub" ...)
+      )
    )
    :properties (
       :<key> "<value>"
