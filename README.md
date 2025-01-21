@@ -352,7 +352,7 @@ Let say, "alpha.lisp" from "alpha" module exports "hello" function.
    ))
 ```
 
-**;; Bundle of source files ;;**
+**;; Bundle of the source files ;;**
 
 Indeed, Exo encourages a developer to separate packages for each functionality,
 but in some cases it is necessary to load a code of the several source files into one package.
@@ -377,7 +377,7 @@ b.lisp
 (exo
    (:of-bundle #:a)
 ```
-Keyword `:bundle!` (with exclamation) do the same, 
+Form `(:bundle! ...)` (with exclamation) do the same, 
 but code of mentioned files will loaded before a code of the bundle head file.
 
 **;; Install module. Local and remote dependencies ;;**
