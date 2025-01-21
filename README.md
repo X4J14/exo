@@ -191,7 +191,7 @@ In other words, installing and running either unsigned modules or modules signed
 Examples:
 ```lisp
 (
-   :exo-version 1.0s
+   :exo-version 1.0
    :name "Alpha"
    :description "Prime Alpha repository"
    :repository (
