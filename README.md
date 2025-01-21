@@ -182,26 +182,6 @@ File structure:
 (exo:remove :<mod-id> "<mod-version>")
 
 ```
-**;; Secure repository ;;**
-
-When secure mode is enabled `(:secure t)`, then property `(:signatures (...))` should be defined also.
-Secure mode guarantees that only signed modules by predefined keys can be installed or runned.
-In other words, installing and running either unsigned modules or modules signed by unknown keys will forbidden.
-
-Examples:
-```lisp
-(
-   :exo-version 1.0
-   :name "Alpha"
-   :description "Prime Alpha repository"
-   :repository (
-      :secure t
-      :signatures ((
-         :key "RWTVUUc2t+JbvfzMB+OX3sBhqWvrHuikwvJXE1sgMVXlnQLLiRgyQ00c"
-         :owner "User"
-         :url "https://codeberg.org/user/repo/raw/branch/main/key.pub")
-      )))
-```
 ;;; Module ;;;
 
 **; Configuration file: exo.mod**
@@ -259,11 +239,6 @@ All properties are optional except mentiond below:
 Each source file managed by Exo should started with the "exo" function:
 ```lisp
 (exo
-   (:export
-      :intern
-         #:<symbol> ...
-      :extern
-         #:<symbol> ...)
    (:import
       :intern
          #:<package>
@@ -272,14 +247,18 @@ Each source file managed by Exo should started with the "exo" function:
       :extern
          ...
       :runtime
-         ...
-   )) 
+         ...)
+   (:export
+      :intern
+         #:<symbol> ...
+      :extern
+         #:<symbol> ...))
 ;...
 (module code)
 ;...
 ```
 *Note:
-The :import block must be placed always below the :export block when the latter is specified.*
+The :export block must be placed always below the :import block when the latter is specified.*
 
 **;; Package types (relations) ;;**
 
@@ -289,11 +268,11 @@ The :import block must be placed always below the :export block when the latter 
 
 **;; Export/import from/to module ;;**
 
-Export and import has 2 main layers:
+Export and import has 2 layers:
 1) intern(al) - symbols will available within the same module
 2) extern(al) - symbols will available for any external modules within repository
 
-Additionally, :import provides :runtime key to import ordinary packages from runtime.
+Additionally, :import provides :runtime keyword to import ordinary packages from runtime.
 
 Example:
 Let say, "alpha.lisp" from "alpha" module exports "hello" function.
@@ -372,6 +351,34 @@ Let say, "alpha.lisp" from "alpha" module exports "hello" function.
 	... the same as above in beta.lisp ...
    ))
 ```
+
+**;; Package bundle ;;**
+
+In some cases it is necessary to merge several source files into one package.
+Also it is very handy to convert quicklisp packages to Exo world.
+Keywords `:bundle`, `:bundle!`, `:of-bundle` are provided.
+```
+/src
+   a.lisp
+   b.lisp
+   c.lisp
+```
+a.lisp (bundle head file)
+```lisp
+(exo
+   (:bundle #:b #:c)
+```
+Code of mentioned files `(:bundle #:b #:c)`  will load to mod-id/a package
+after a code of the bundle head file.
+
+b.lisp
+```lisp
+(exo
+   (:of-bundle #:a)
+```
+Keyword `:bundle!` (with exclamation) do the same, 
+but code of mentioned files will loaded before a code of the bundle head file.
+
 **;; Install module. Local and remote dependencies ;;**
 
 To do anything, Exo requires to set repository first.
@@ -395,7 +402,7 @@ The command will create module directory in the repository:
 	exo.mod ; copy of the "<mod-cfg-path>"
 ```
 **; Remote**
-Remote installation make the same thing, but first download files to temporary directory of repository.
+Remote installation make the same things, but first download files to temporary directory of repository.
 ```lisp
 (exo:install :codeberg/github "<owner>/<repo>" :branch "<value>" :<mod-id> "<mod-version>") ;=> <module>
 ```
@@ -440,7 +447,7 @@ So, before to install run a commamd:
 
 **;; Running module ;;**
 
-Module can be runnable as application.
+Module can be runnable as an application.
 
 To make module runnable requires:
 1) Run property must be defined.
@@ -452,7 +459,7 @@ Example:
 (define exo-run (mod-path mod-props)
    ...)
 ```
-*Note: Exo search a run function in the :intern export layer.*
+*Note: Exo searches "run" function in the :intern export layer.*
 
 **; Run and test parameters**
 ```lisp
@@ -481,12 +488,12 @@ When module created its install to repository and run in repository mode.
 (exo:run "<mod-cfg-path>") => <module> ; by default used :run parameter and "exo-run" function
 (exo:run "<mod-cfg-path>" :<run-or-test>)  => <module> ; use custom parameter to run
 
-; Example:
+; Examples:
 (exo:run "~/alpha-mod/exo.mod")
 (exo:run "~/alpha-mod/exo.mod" :run-whatever)
 (exo:run "~/alpha-mod/exo.mod" (:package 1 2 3)) ; will call "exo-run" by default
 (exo:run "~/alpha-mod/exo.mod" (:package@run-all 1 2 3)) ; "run-all" function specified
-(exo:run "~/alpha-mod/exo.mod" (:@run-all 1 2 3)) ; Shorthand version.
+(exo:run "~/alpha-mod/exo.mod" (:@run-all 1 2 3)) ; Shorthand version.  The package name the same as module id.
 (exo:run "~/.exo/alpha/1.0/exo.mod") ; this is possible but repository and its settings will be ignored
 
 **; Run module in repository mode**
@@ -494,13 +501,35 @@ When module created its install to repository and run in repository mode.
 (exo:run (:<mod-id> "<mod-version>") => <module>
 (exo:run (:<mod-id> "<mod-version>") :<run-or-test>)  => <module>
 
-Example:
+Examples:
 (exo:run (:alpha "1.0"))
 (exo:run (:omega "0.1a") :test)
 (exo:run (:omega "0.1a") (:package 1 2 3)) ; will call "exo-run" by default
 (exo:run (:omega "0.1a") (:package@test-all 1 2 3)) ; "run-all" function specified
 (exo:run (:omega "0.1a") (:@test-all 1 2 3)) ; Shorthand version.
 ```
+
+**;; Secure repository ;;**
+
+When secure mode is enabled `(:secure t)`, then property `(:signatures (...))` should be defined also.
+Secure mode guarantees that only signed modules by predefined keys can be installed or runned.
+In other words, installing and running either unsigned modules or modules signed by unknown keys will forbidden.
+
+Examples:
+```lisp
+(
+   :exo-version 1.0
+   :name "Alpha"
+   :description "Prime Alpha repository"
+   :repository (
+      :secure t
+      :signatures ((
+         :key "RWTVUUc2t+JbvfzMB+OX3sBhqWvrHuikwvJXE1sgMVXlnQLLiRgyQ00c"
+         :owner "User"
+         :url "https://codeberg.org/user/repo/raw/branch/main/key.pub")
+      )))
+```
+
 **;; Signing module ;;**
 
 Signing the module creates "exo.mod.sig" file in the root module directory which contains hashes of all module files.
@@ -544,7 +573,7 @@ To provide security EXO verifies signed modules while installing and before runn
 
 **; Interactive mode**
 
- When enabled, the exo-error print message to standard output, otherwise printed debug stacktrace.
+ When enabled, the (exo-error) prints messages to standard output, otherwise throws debug stacktrace.
  Default is true
 ```lisp
 (exo:interactive) => value
@@ -561,7 +590,7 @@ To provide security EXO verifies signed modules while installing and before runn
 
 **; Check utils**
 
-Check existance of utils (`curl` and `signify`).
+Check existance of utils (`curl`, `signify`, `git`).
 
 ```lisp
 (exo:check-utils)
