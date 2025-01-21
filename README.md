@@ -367,7 +367,7 @@ Keywords `:bundle`, `:bundle!`, `:of-bundle` are provided.
 a.lisp (bundle head file)
 ```lisp
 (exo
-   (:bundle #:b #:c)
+   (:bundle #:b #:c))
 ```
 Code of mentioned files `(:bundle #:b #:c)`  will load to mod-id/a package
 after a code of the bundle head file.
@@ -375,7 +375,7 @@ after a code of the bundle head file.
 b.lisp
 ```lisp
 (exo
-   (:of-bundle #:a)
+   (:of-bundle #:a))
 ```
 Form `(:bundle! ...)` (with exclamation) do the same, 
 but code of mentioned files will loaded before a code of the bundle head file.
