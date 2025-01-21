@@ -285,8 +285,8 @@ Let say, "alpha.lisp" from "alpha" module exports "hello" function.
          /src ; all source files always here
             alpha.lisp ; package "alpha" ; possible shorthand of "alpha/alpha" when the file name the same as module id
             beta.lisp  ; package "alpha/beta"
-         /test
-            gamma.lisp ; package "alpha/test/gamma"
+            /test
+               gamma.lisp ; package "alpha/test/gamma"
          exo.mod ; module config file
    /omega
       /0.1a
