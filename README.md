@@ -354,7 +354,8 @@ Let say, "alpha.lisp" from "alpha" module exports "hello" function.
 
 **;; Bundle of package ;;**
 
-In some cases it is necessary to merge several source files into one package.
+Indeed, Exo encourages a developer to separate packages for each functionality,
+but in some cases it is necessary to load a code of the several source files into one package.
 Also it is very handy to convert Quicklisp packages to Exo world.
 Keywords `:bundle`, `:bundle!`, `:of-bundle` are provided.
 ```
