@@ -352,7 +352,7 @@ Let say, "alpha.lisp" from "alpha" module exports "hello" function.
    ))
 ```
 
-**;; Bundle of the packages ;;**
+**;; Bundle of source files ;;**
 
 Indeed, Exo encourages a developer to separate packages for each functionality,
 but in some cases it is necessary to load a code of the several source files into one package.
