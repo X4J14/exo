@@ -352,7 +352,7 @@ Let say, "alpha.lisp" from "alpha" module exports "hello" function.
    ))
 ```
 
-**;; Package bundle ;;**
+**;; Bundle of package ;;**
 
 In some cases it is necessary to merge several source files into one package.
 Also it is very handy to convert quicklisp packages to Exo world.
