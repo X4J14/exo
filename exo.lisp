@@ -21,7 +21,9 @@
 ; CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 ; TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THIS
 ; SOFTWARE OR THE USE OR OTHER DEALINGS IN THIS SOFTWARE.
-;;;;~%")
+;
+; Runtime: ~s ~s
+;;;;~%" (lisp-implementation-type) (lisp-implementation-version))
 
 (require :uiop)
 (require :sb-posix)
@@ -2088,10 +2090,10 @@
 					(pfmtl "***********************************"))
 		)))
 
-(defmacro exo:sign (mod-path secure-key-path &optional secure-key-pass)
-	`(do-sign ',mod-path ,secure-key-path ,secure-key-pass))
+(defmacro exo:sign (mod-path secure-key-path &optional secure-key-pass resign-without-ask)
+	`(do-sign ',mod-path ,secure-key-path ,secure-key-pass ,resign-without-ask))
 
-(defun do-sign (mod-path secure-key-path secure-key-pass)
+(defun do-sign (mod-path secure-key-path secure-key-pass &optional resign-without-ask)
 	(check-type mod-path module-path "module config path or (<mod-id> \"<mod-ver\")")
 	(check-type secure-key-path string)
 	(check-type secure-key-pass (or null string))
@@ -2109,7 +2111,7 @@
 					(progn
 						(verify-public-key mod secure-key-path secure-key-pass public-key urls)
 						(when (probe-file sig-file-path)
-							(if (yes-or-no-p "Module is already signed and will re-signed. ~%Continue?")
+							(if (or resign-without-ask (yes-or-no-p "Module is already signed and will re-signed. ~%Continue?"))
 								(delete-file sig-file-path)
 								(sign-error "Operation canceled" mod)))
 						(signify-sign mod
@@ -2983,6 +2985,8 @@
 
 (defun set-bundle (type packages &aux (package-name (short-package-name *package*)))
 	(pfmtl "Set ~(~s~) ~s: ~(~s~)" type package-name packages)
+	(dolist (sym packages)
+		(ensure-symbol-uninterned sym "load bundle"))
 	(setf *exo-bundle* (list package-name packages))
 	; force first load bundle files when :bundle! defined
 	(when (eq type :bundle!)
@@ -3014,6 +3018,8 @@
 		(:of-bundle
 			(when (eq (length def) 1)
 				(exo-error ":of-bundle is empty"))
+			(dolist (sym (rest def))
+				(ensure-symbol-uninterned sym "load part of bundle"))
 			(unless *exo-bundle*
 				(exo-error "Forbidden to load ~(~s~) because bundle is not defined" def))
 			(unless (find (first *exo-bundle*) (rest def) :test #'string-equal)
